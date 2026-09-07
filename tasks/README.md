@@ -74,7 +74,10 @@ done
 
 ### 3. Progetto (board)
 
+I Projects v2 richiedono uno scope che il token di `gh` non ha di default:
+
 ```sh
+gh auth refresh -s project,read:project      # login interattivo, una volta sola
 gh project create --owner @me --title "Skull King Tracker"
 ```
 
