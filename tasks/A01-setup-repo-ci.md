@@ -16,17 +16,21 @@ partita, quando è troppo tardi), la rete di test non è opzionale.
 
 ## Criteri di accettazione
 
-- [ ] `flutter analyze` non produce warning (lint attivi almeno `flutter_lints`)
-- [ ] `flutter test` gira in CI su ogni push e PR verso `main`
-- [ ] `flutter build web --release` gira in CI e fallisce la pipeline se rompe
-- [ ] La coverage viene prodotta e pubblicata come artefatto (senza soglia bloccante)
-- [ ] La versione di Flutter è **pinnata a `3.47.2`** in CI e in `pubspec.yaml`,
+- [x] `flutter analyze` non produce warning (lint attivi almeno `flutter_lints`)
+- [x] `flutter test` gira in CI su ogni push e PR verso `main`
+- [x] `flutter build web --release` gira in CI e fallisce la pipeline se rompe
+- [x] La coverage viene prodotta e pubblicata come artefatto (senza soglia bloccante)
+- [x] La versione di Flutter è **pinnata a `3.47.2`** in CI e in `pubspec.yaml`,
       e un aggiornamento richiede una PR dedicata
-- [ ] I commit seguono **Conventional Commits**, verificati automaticamente in PR
-- [ ] Un merge su `main` produce da solo tag, `CHANGELOG.md` e bump di versione
+- [x] I commit seguono **Conventional Commits**, verificati automaticamente in PR
+- [x] Un merge su `main` produce da solo tag, `CHANGELOG.md` e bump di versione
       in `pubspec.yaml` (nessun bump manuale)
-- [ ] `main` è protetto: no push diretto, PR con CI verde obbligatoria
-- [ ] `README.md` spiega in 10 righe: cos'è, come si avvia, come si testa
+- [x] `main` è protetto: no push diretto, PR con CI verde obbligatoria
+- [x] `README.md` spiega in 10 righe: cos'è, come si avvia, come si testa
+
+> Stato: implementato nella PR #32. `pr-title.yml` e `release.yml` diventano
+> operativi dal primo merge su `main` (i workflow devono esistere sul branch
+> base per essere eseguiti).
 
 ## Note tecniche
 
