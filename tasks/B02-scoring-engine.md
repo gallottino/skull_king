@@ -39,6 +39,10 @@ Il punteggio di partita è la somma cumulativa dei round.
 Scrivi prima la tabella dei test, poi l'implementazione. Il costo è mezz'ora e
 il ritorno è non dover mai più discutere se un punteggio è giusto.
 
+> **Promemoria da `A01`**: quando si apre questo ticket va aggiunto il criterio
+> di accettazione "soglia di coverage **bloccante** su `lib/domain/`" nella CI.
+> In `A01` si è deciso di rimandarla qui, non di rinunciarci.
+
 ## Fuori scope
 
 Bonus dell'espansione (→ `B03`), UI (→ `E05`).
