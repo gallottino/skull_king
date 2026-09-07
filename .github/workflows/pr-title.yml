@@ -1,0 +1,36 @@
+name: PR title
+
+on:
+  pull_request_target:
+    types: [opened, edited, reopened, synchronize]
+
+permissions:
+  pull-requests: read
+
+jobs:
+  conventional-commit:
+    name: Conventional Commits
+    runs-on: ubuntu-latest
+    steps:
+      # Il merge è in squash: il titolo della PR diventa il messaggio di commit
+      # su main, ed è quello che release-please legge per calcolare la versione.
+      - uses: amannn/action-semantic-pull-request@v5
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          types: |
+            feat
+            fix
+            chore
+            docs
+            refactor
+            test
+            perf
+            ci
+            build
+            revert
+          requireScope: false
+          subjectPattern: ^(?![A-Z]).+$
+          subjectPatternError: |
+            Il titolo "{subject}" deve iniziare in minuscolo e descrivere il
+            cambiamento all'imperativo (es. "feat: aggiungi la lobby realtime").
