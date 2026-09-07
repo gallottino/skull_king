@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html>
+<html lang="it">
 <head>
   <!--
     If you are serving your web app in a path other than the root, change the
@@ -18,21 +18,188 @@
 
   <meta charset="UTF-8">
   <meta content="IE=Edge" http-equiv="X-UA-Compatible">
-  <meta name="description" content="A new Flutter project.">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <meta name="description" content="Segnapunti condiviso per Skull King: stanze, puntate e classifiche in tempo reale.">
+  <meta name="theme-color" content="#301C13">
 
-  <!-- iOS meta tags & icons -->
+  <!-- iOS: niente barra del browser una volta aggiunta alla home -->
   <meta name="mobile-web-app-capable" content="yes">
-  <meta name="apple-mobile-web-app-status-bar-style" content="black">
-  <meta name="apple-mobile-web-app-title" content="skull_king">
-  <link rel="apple-touch-icon" href="icons/Icon-192.png">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="Skull King">
+  <link rel="apple-touch-icon" sizes="180x180" href="icons/apple-touch-icon-180.png">
 
-  <!-- Favicon -->
   <link rel="icon" type="image/png" href="favicon.png"/>
 
-  <title>skull_king</title>
+  <title>Skull King Score Tracker</title>
   <link rel="manifest" href="manifest.json">
+
+  <style>
+    :root {
+      --sk-wood-deep: #301C13;
+      --sk-wood: #54301C;
+      --sk-parchment: #BB9866;
+      --sk-gold: #E3C089;
+    }
+
+    html, body {
+      margin: 0;
+      padding: 0;
+      height: 100%;
+      background-color: var(--sk-wood-deep);
+      overscroll-behavior: none;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      color: var(--sk-parchment);
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    /* Splash: copre il caricamento del bundle Flutter, che su rete mobile
+       non è istantaneo. Si toglie all'evento flutter-first-frame. */
+    #splash {
+      position: fixed;
+      inset: 0;
+      z-index: 9000;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 20px;
+      background-color: var(--sk-wood-deep);
+      transition: opacity 300ms ease-out;
+    }
+
+    #splash.hidden {
+      opacity: 0;
+      pointer-events: none;
+    }
+
+    #splash img {
+      width: 132px;
+      height: 132px;
+      border-radius: 26px;
+    }
+
+    #splash .bar {
+      width: 132px;
+      height: 3px;
+      border-radius: 999px;
+      background-color: rgba(187, 152, 102, 0.25);
+      overflow: hidden;
+    }
+
+    #splash .bar::after {
+      content: "";
+      display: block;
+      width: 40%;
+      height: 100%;
+      border-radius: 999px;
+      background-color: var(--sk-gold);
+      animation: sk-slide 1.1s ease-in-out infinite;
+    }
+
+    @keyframes sk-slide {
+      0%   { transform: translateX(-100%); }
+      100% { transform: translateX(250%); }
+    }
+
+    /* Landscape obbligatorio: iOS ignora `orientation` nel manifest, quindi
+       questo overlay è l'implementazione vera, non un fallback. Copre tutto
+       e blocca l'interazione con l'app sottostante. */
+    #rotate {
+      display: none;
+    }
+
+    @media (orientation: portrait) {
+      #rotate {
+        position: fixed;
+        inset: 0;
+        z-index: 9500;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        gap: 16px;
+        padding: 24px;
+        box-sizing: border-box;
+        text-align: center;
+        background-color: var(--sk-wood-deep);
+      }
+    }
+
+    #rotate .phone {
+      width: 54px;
+      height: 88px;
+      border: 3px solid var(--sk-parchment);
+      border-radius: 10px;
+      animation: sk-rotate 2.4s ease-in-out infinite;
+    }
+
+    @keyframes sk-rotate {
+      0%, 30%   { transform: rotate(0deg); }
+      55%, 85%  { transform: rotate(-90deg); }
+      100%      { transform: rotate(0deg); }
+    }
+
+    #rotate h1 {
+      margin: 0;
+      font-size: 20px;
+      font-weight: 600;
+      color: var(--sk-gold);
+    }
+
+    #rotate p {
+      margin: 0;
+      font-size: 15px;
+      line-height: 1.4;
+      max-width: 26ch;
+      opacity: 0.8;
+    }
+  </style>
 </head>
 <body>
+  <div id="splash">
+    <img src="icons/Icon-192.png" alt="Skull King">
+    <div class="bar"></div>
+  </div>
+
+  <div id="rotate">
+    <div class="phone"></div>
+    <h1>Ruota il telefono</h1>
+    <p>Skull King si gioca in orizzontale: gira il telefono per continuare.</p>
+  </div>
+
+  <script>
+    // Lo splash sparisce quando Flutter ha davvero disegnato il primo frame.
+    window.addEventListener('flutter-first-frame', function () {
+      var splash = document.getElementById('splash');
+      if (!splash) return;
+      splash.classList.add('hidden');
+      splash.addEventListener('transitionend', function () { splash.remove(); });
+    });
+
+    // Wake Lock: il telefono resta acceso durante la partita. Non è
+    // supportata ovunque (Safari < 16.4, browser vari): degradazione silenziosa.
+    (function () {
+      if (!('wakeLock' in navigator)) return;
+      var lock = null;
+      async function acquire() {
+        try {
+          lock = await navigator.wakeLock.request('screen');
+          lock.addEventListener('release', function () { lock = null; });
+        } catch (e) {
+          // Schermo bloccato, tab in background, permesso negato: si prosegue.
+        }
+      }
+      document.addEventListener('visibilitychange', function () {
+        if (document.visibilityState === 'visible' && lock === null) acquire();
+      });
+      acquire();
+    })();
+  </script>
+
   <!--
     You can customize the "flutter_bootstrap.js" script.
     This is useful to provide a custom configuration to the Flutter loader
