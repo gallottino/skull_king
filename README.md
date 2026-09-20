@@ -12,6 +12,25 @@ flutter pub get
 flutter run -d chrome
 ```
 
+L'app è una PWA installabile: si aggiunge alla home da Chrome (Android) e da
+Safari (iOS → *Aggiungi a Home*) e si apre a schermo intero. È pensata **solo in
+orizzontale**: in portrait mostra un invito a ruotare il telefono. Non ha service
+worker, quindi richiede rete e ogni avvio carica l'ultima versione pubblicata.
+
+```sh
+flutter build web --release --pwa-strategy=none
+```
+
+### Provarla da un telefono vero
+
+L'installazione come PWA e il Wake Lock richiedono un'origine sicura:
+`localhost` lo è, l'IP della LAN no. Per il test con due device serve un tunnel HTTPS:
+
+```sh
+flutter run -d web-server --web-port 8080
+cloudflared tunnel --url http://localhost:8080   # stampa un URL https:// pubblico
+```
+
 ## Test e qualità
 
 ```sh
@@ -21,7 +40,7 @@ dart format .
 ```
 
 Gli stessi tre comandi girano in CI su ogni PR verso `main`, insieme a
-`flutter build web --release`: una PR non si merge-a con la CI rossa.
+`flutter build web --release --pwa-strategy=none`: una PR non si merge-a con la CI rossa.
 
 ## Contribuire
 

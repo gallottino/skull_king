@@ -58,4 +58,5 @@ jobs:
           retention-days: 14
 
       - name: Build web
-        run: flutter build web --release
+        # --pwa-strategy=none: nessun service worker, per scelta (vedi A02).
+        run: flutter build web --release --pwa-strategy=none
